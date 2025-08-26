@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Airflow
+airflow.cfg
+airflow.db
+logs/
+
+# Docker
+*.log
+.env
+.dockerignore
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# Others
+*.sqlite
+*.db
+*.DS_Store

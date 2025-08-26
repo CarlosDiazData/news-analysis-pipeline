@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: airflow_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    volumes:
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  airflow:
+    build: .
+    image: airflow-newsapi:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:${POSTGRES_PASSWORD:-airflow}@postgres:5432/airflow_db
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY:-}
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:${POSTGRES_PASSWORD:-airflow}@postgres:5432/airflow_db
+      - AIRFLOW_CONN_POSTGRES_DEFAULT=postgresql+psycopg2://airflow:${POSTGRES_PASSWORD:-airflow}@postgres:5432/airflow_db 
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create --username admin --password ${AIRFLOW_PASSWORD:-admin} --firstname Admin --lastname User --role Admin --email ${AIRFLOW_EMAIL:-admin@example.com} &&
+      (airflow scheduler & airflow webserver)
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /opt/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+
+volumes:
+  postgres_data:

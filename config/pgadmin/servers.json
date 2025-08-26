@@ -1,0 +1,14 @@
+{
+    "Servers": {
+      "1": {
+        "Name": "Airflow-Postgres",
+        "Group": "Servers",
+        "Host": "postgres",
+        "Port": 5432,
+        "MaintenanceDB": "airflow_db",
+        "Username": "airflow",
+        "Password": "airflow", 
+        "SSLMode": "prefer"
+      }
+    }
+  }

@@ -1,0 +1,18 @@
+# Airflow provider packages
+apache-airflow-providers-postgres>=5.6.0
+
+# Database
+psycopg2-binary>=2.9.6
+
+# HTTP and APIs
+requests>=2.28.2
+
+# Configuration
+python-dotenv>=0.21.1
+
+# Web Scraping
+beautifulsoup4>=4.12.2
+
+# Natural Language Processing
+textblob>=0.17.1
+spacy>=3.4.0
