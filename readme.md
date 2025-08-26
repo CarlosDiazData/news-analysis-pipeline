@@ -29,24 +29,7 @@ The final output is a dynamic, interactive Power BI dashboard for visualizing ne
 
 The data flows through the system as follows:
 
-```Mermaid
-graph TD
-    A[NewsAPI] --> B{Airflow DAG};
-    B -- E: Extract --> C[Article URLs & Metadata];
-    C --> D{T: Scrape};
-    D -- Fetches full HTML --> E[Web Pages];
-    E --> D;
-    D -- Enriches content --> F[Full-Text Articles];
-    F --> G{T: Analyze};
-    G -- Uses ML Models --> H[Sentiment & Entities];
-    H --> G;
-    G -- Enriches data --> I[Final Enriched Data];
-    I --> J{T: Load};
-    J -- Inserts/Updates data --> K[(PostgreSQL DB)];
-    K --> L[Power BI];
-    L --> M[Interactive Dashboard];
-   
-```
+![](https://raw.githubusercontent.com/CarlosDiazData/news-analysis-pipeline/refs/heads/main/Docs/Graph.png)
 
 ## Tech Stack
 
