@@ -56,8 +56,6 @@ graph TD
     AIRFLOW -.-> LOAD
 ```
 
-![Architecture Graph](https://raw.githubusercontent.com/CarlosDiazData/news-analysis-pipeline/refs/heads/main/Docs/Graph.png)
-
 ## Tech Stack
 
 -   **Orchestration**: Apache Airflow
