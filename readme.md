@@ -1,6 +1,11 @@
 # End-to-End News Analysis ETL Pipeline with ML and Power BI
 
-[![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)](https://www.google.com/url?sa=E&q=https%3A%2F%2Fopensource.org%2Flicenses%2FMIT)
+[![Python](https://img.shields.io/badge/Python-3.9-blue)](https://www.python.org/)
+[![Airflow](https://img.shields.io/badge/Apache-Airflow_2.7-brightgreen)](https://airflow.apache.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-4169E1?logo=postgresql)](https://www.postgresql.org/)
+[![Power BI](https://img.shields.io/badge/Power_BI-Dashboard-yellow)](https://powerbi.microsoft.com/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE.txt)
 
 This project implements a complete, automated ETL pipeline that extracts news articles from the NewsAPI, enriches them with full-text content via web scraping, performs Natural Language Processing (NLP) to extract sentiment and named entities, and loads the structured data into a PostgreSQL database. The entire workflow is orchestrated with Apache Airflow and containerized with Docker.
 
@@ -29,7 +34,29 @@ The final output is a dynamic, interactive Power BI dashboard for visualizing ne
 
 The data flows through the system as follows:
 
-![](https://raw.githubusercontent.com/CarlosDiazData/news-analysis-pipeline/refs/heads/main/Docs/Graph.png)
+```mermaid
+graph TD
+    NEWS[NewsAPI<br/>Top Headlines] -->|fetch| EXTRACT[Airflow Task<br/>Extract Articles]
+    EXTRACT -->|article URLs| SCRAPE[Airflow Task<br/>Web Scraping<br/>BeautifulSoup4]
+    SCRAPE -->|full text| NLP[Airflow Task<br/>NLP Analysis<br/>spaCy + TextBlob]
+    NLP -->|sentiment + NER| LOAD[Airflow Task<br/>Load to PostgreSQL]
+    LOAD -->|structured data| DB[(PostgreSQL 13<br/>news_articles)]
+
+    DB -->|connect| PBI[Power BI<br/>Dashboard]
+
+    subgraph Docker Compose
+        AIRFLOW[Apache Airflow<br/>DAG Scheduler]
+        POSTGRES[PostgreSQL]
+        PGADMIN[pgAdmin]
+    end
+
+    AIRFLOW -.-> EXTRACT
+    AIRFLOW -.-> SCRAPE
+    AIRFLOW -.-> NLP
+    AIRFLOW -.-> LOAD
+```
+
+![Architecture Graph](https://raw.githubusercontent.com/CarlosDiazData/news-analysis-pipeline/refs/heads/main/Docs/Graph.png)
 
 ## Tech Stack
 
