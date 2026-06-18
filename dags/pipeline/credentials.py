@@ -20,8 +20,8 @@ def _load_dotenv() -> None:
     try:
         from dotenv import load_dotenv as _load_dotenv_impl
 
-        # .env lives at project root: one level above dags/
-        dotenv_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+        # .env lives at project root: two levels above dags/pipeline/
+        dotenv_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         if os.path.exists(dotenv_path):
             _load_dotenv_impl(dotenv_path)
     except ImportError:
