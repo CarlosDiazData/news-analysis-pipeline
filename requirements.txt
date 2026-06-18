@@ -16,3 +16,11 @@ beautifulsoup4>=4.12.2
 # Natural Language Processing
 textblob>=0.17.1
 spacy>=3.4.0
+
+# Retry and resilience
+tenacity>=8.2.0
+
+# Testing
+pytest>=7.0.0
+requests-mock>=1.11.0
+apache-airflow>=2.7.0

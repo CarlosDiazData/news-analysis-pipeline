@@ -27,6 +27,9 @@ logs/
 .vscode/
 .idea/
 
+# Credentials
+config/pgadmin/.pgpass
+
 # Others
 *.sqlite
 *.db

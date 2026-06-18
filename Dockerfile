@@ -15,7 +15,7 @@ USER airflow
 COPY requirements.txt /opt/airflow/requirements.txt
 RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
 
-#Download the spaCy language model
+# Download the spaCy language model
 RUN python -m spacy download en_core_web_sm
 
 # Disable loading of example DAGs
