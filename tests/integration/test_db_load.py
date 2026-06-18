@@ -46,8 +46,8 @@ class TestDbLoadRoundTrip:
         mock_context["ti"].xcom_pull.return_value = integration_articles
 
         # Patch get_db_connection to return our fixture connection
-        with patch("news_etl_dag.get_db_connection", return_value=db_connection):
-            from news_etl_dag import load_data_to_postgres
+        with patch("pipeline.load.get_db_connection", return_value=db_connection):
+            from pipeline.load import load_data_to_postgres
 
             load_data_to_postgres(**mock_context)
 
@@ -88,8 +88,8 @@ class TestDbLoadRoundTrip:
         mock_context["ti"].xcom_pull.return_value = integration_articles
 
         # First insert
-        with patch("news_etl_dag.get_db_connection", return_value=db_connection):
-            from news_etl_dag import load_data_to_postgres
+        with patch("pipeline.load.get_db_connection", return_value=db_connection):
+            from pipeline.load import load_data_to_postgres
 
             load_data_to_postgres(**mock_context)
 
@@ -99,7 +99,7 @@ class TestDbLoadRoundTrip:
         updated[0]["sentiment_polarity"] = 0.99
         mock_context["ti"].xcom_pull.return_value = updated
 
-        with patch("news_etl_dag.get_db_connection", return_value=db_connection):
+        with patch("pipeline.load.get_db_connection", return_value=db_connection):
             load_data_to_postgres(**mock_context)
 
         # Verify only ONE row exists (not duplicated)
@@ -130,8 +130,8 @@ class TestDbLoadRoundTrip:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = []
 
-        with patch("news_etl_dag.get_db_connection", return_value=db_connection):
-            from news_etl_dag import load_data_to_postgres
+        with patch("pipeline.load.get_db_connection", return_value=db_connection):
+            from pipeline.load import load_data_to_postgres
 
             result = load_data_to_postgres(**mock_context)
 

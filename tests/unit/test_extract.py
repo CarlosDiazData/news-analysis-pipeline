@@ -26,8 +26,8 @@ class TestExtractSuccess:
         THEN it returns the parsed article list."""
         requests_mock.get(NEWS_API_ENDPOINT, json=newsapi_response, status_code=200)
 
-        with patch("news_etl_dag.resolve_newsapi_key", return_value="test-api-key"):
-            from news_etl_dag import extract_data_from_newsapi
+        with patch("pipeline.extract.resolve_newsapi_key", return_value="test-api-key"):
+            from pipeline.extract import extract_data_from_newsapi
 
             result = extract_data_from_newsapi()
 
@@ -41,8 +41,8 @@ class TestExtractSuccess:
         response = {"status": "ok", "totalResults": 0, "articles": []}
         requests_mock.get(NEWS_API_ENDPOINT, json=response, status_code=200)
 
-        with patch("news_etl_dag.resolve_newsapi_key", return_value="test-api-key"):
-            from news_etl_dag import extract_data_from_newsapi
+        with patch("pipeline.extract.resolve_newsapi_key", return_value="test-api-key"):
+            from pipeline.extract import extract_data_from_newsapi
 
             result = extract_data_from_newsapi()
 
@@ -62,8 +62,8 @@ class TestExtractErrors:
         WHEN extract runs THEN it raises AirflowException."""
         requests_mock.get(NEWS_API_ENDPOINT, status_code=401, reason="Unauthorized")
 
-        with patch("news_etl_dag.resolve_newsapi_key", return_value="test-api-key"):
-            from news_etl_dag import extract_data_from_newsapi
+        with patch("pipeline.extract.resolve_newsapi_key", return_value="test-api-key"):
+            from pipeline.extract import extract_data_from_newsapi
 
             with pytest.raises(AirflowException, match="Connection error"):
                 extract_data_from_newsapi()
@@ -78,8 +78,8 @@ class TestExtractErrors:
         }
         requests_mock.get(NEWS_API_ENDPOINT, json=response, status_code=200)
 
-        with patch("news_etl_dag.resolve_newsapi_key", return_value="test-api-key"):
-            from news_etl_dag import extract_data_from_newsapi
+        with patch("pipeline.extract.resolve_newsapi_key", return_value="test-api-key"):
+            from pipeline.extract import extract_data_from_newsapi
 
             with pytest.raises(AirflowException, match="API key is invalid"):
                 extract_data_from_newsapi()
@@ -88,10 +88,10 @@ class TestExtractErrors:
         """GIVEN NEWS_API_KEY is not resolvable
         WHEN extract runs THEN it raises AirflowException."""
         with patch(
-            "news_etl_dag.resolve_newsapi_key",
+            "pipeline.extract.resolve_newsapi_key",
             side_effect=RuntimeError("NewsAPI key not found"),
         ):
-            from news_etl_dag import extract_data_from_newsapi
+            from pipeline.extract import extract_data_from_newsapi
 
             with pytest.raises(AirflowException, match="NewsAPI key not found"):
                 extract_data_from_newsapi()
