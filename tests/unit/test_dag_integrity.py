@@ -48,7 +48,7 @@ class TestDagIntegrity:
         assert len(dag_ids) > 0, "No DAGs found in dags/ directory"
 
         for dag_id in dag_ids:
-            dag = dagbag.get_dag(dag_id)
+            dag = dagbag.dags.get(dag_id)
             # Airflow raises during DAG creation for cyclical dependencies,
             # so if the DAG exists, it's cycle-free.
             assert dag is not None, f"DAG '{dag_id}' is None"
@@ -65,7 +65,7 @@ class TestDagIntegrity:
         dag_folder = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
         dagbag = DagBag(dag_folder=dag_folder, include_examples=False)
 
-        dag = dagbag.get_dag("ingestion_newsapi_postgres_with_scraping")
+        dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
         assert dag is not None, "Expected DAG not found"
 
         task_ids = {t.task_id for t in dag.tasks}

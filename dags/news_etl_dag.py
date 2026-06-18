@@ -422,7 +422,7 @@ with DAG(
     dag_id=DAG_ID,
     description="News ingestion from NewsAPI to PostgreSQL with web scraping enrichment",
     start_date=datetime(2024, 1, 1),
-    schedule_interval="@daily",
+    schedule="@daily",
     catchup=False,
     tags=["newsapi", "postgres", "scraping", "news"],
     default_args=default_args,
@@ -449,21 +449,18 @@ with DAG(
     scrape_task = PythonOperator(
         task_id="scrape_content_task",
         python_callable=scrape_and_enrich_content,
-        provide_context=True,
     )
 
     # Task 3: ML analysis
     ml_analysis_task = PythonOperator(
         task_id="ml_analysis_task",
         python_callable=analyze_articles,
-        provide_context=True,
     )
 
     # Task 4: Load enriched data into PostgreSQL
     load_task = PythonOperator(
         task_id="load_postgres_task",
         python_callable=load_data_to_postgres,
-        provide_context=True,
     )
 
     # Task dependency chain
