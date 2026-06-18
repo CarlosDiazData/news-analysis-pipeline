@@ -43,12 +43,12 @@ Chain strategy: pending
 
 ## Phase 3: Strip DAG (Wiring)
 
-- [ ] 3.1 Remove remaining function definitions from `dags/news_etl_dag.py` — keep only imports + DAG definition + task wiring
-- [ ] 3.2 Remove unused stdlib imports: `json`, `ThreadPoolExecutor`, `as_completed`, `urlparse`, `RobotFileParser`, `BeautifulSoup`, `spacy`, `TextBlob` (moved to their respective pipeline modules)
-- [ ] 3.3 Verify: DAG ≤ 100 lines, DagBag import errors = 0, task IDs unchanged
+- [x] 3.1 Remove remaining function definitions from `dags/news_etl_dag.py` — keep only imports + DAG definition + task wiring
+- [x] 3.2 Remove unused stdlib imports: `json`, `ThreadPoolExecutor`, `as_completed`, `urlparse`, `RobotFileParser`, `BeautifulSoup`, `spacy`, `TextBlob` (moved to their respective pipeline modules)
+- [x] 3.3 Verify: DAG ≤ 100 lines, DagBag import errors = 0, task IDs unchanged
 
 ## Phase 4: Cleanup
 
-- [ ] 4.1 Verify zero `from news_etl_dag import` / `patch("news_etl_dag.` references remain in test files
-- [ ] 4.2 Final: `pytest tests/` — full suite passes
-- [ ] 4.3 Confirm: same DAG_ID, same schedule, same task IDs, same behavior
+- [x] 4.1 Verify zero `from news_etl_dag import` / `patch("news_etl_dag.` references remain in test files
+- [x] 4.2 Final: `pytest tests/` — full suite passes
+- [x] 4.3 Confirm: same DAG_ID, same schedule, same task IDs, same behavior
