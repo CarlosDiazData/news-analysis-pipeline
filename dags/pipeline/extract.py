@@ -28,12 +28,6 @@ def _is_retryable(exception: BaseException) -> bool:
     return True
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=4),
-    retry=retry_if_exception(_is_retryable),
-    reraise=True,
-)
 def _validate_article(article: dict) -> bool:
     """Validate a single article dict has required fields.
 
@@ -52,6 +46,12 @@ def _validate_article(article: dict) -> bool:
     return True
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=4),
+    retry=retry_if_exception(_is_retryable),
+    reraise=True,
+)
 def _fetch_newsapi(endpoint: str, params: dict) -> list[dict]:
     """Fetch articles from NewsAPI with retry on transient errors.
 
