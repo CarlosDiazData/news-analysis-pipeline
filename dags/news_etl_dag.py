@@ -23,8 +23,11 @@ from airflow.operators.python import PythonOperator
 # Web Scraping and ML modules
 from bs4 import BeautifulSoup
 
+# Pipeline modules
+from pipeline.config import DAG_ID, NEWS_API_ENDPOINT
+
 # Credential resolution (task-scoped, never at module top-level)
-from credential_helper import (
+from pipeline.credentials import (
     get_db_connection,
     resolve_max_scrape_workers,
     resolve_newsapi_key,
@@ -37,11 +40,6 @@ from tenacity import (
     wait_exponential,
 )
 from textblob import TextBlob
-
-# Define constants for the DAG configuration
-DAG_ID = "ingestion_newsapi_postgres_with_scraping"
-NEWS_API_ENDPOINT = "https://newsapi.org/v2/top-headlines"
-DEFAULT_CONN_ID = "postgres_default"
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
