@@ -41,7 +41,8 @@ with DAG(
     # NewsAPI to PostgreSQL ETL with Web Scraping
 
     This DAG extracts news articles from NewsAPI, scrapes the full content
-    from each article's URL, and then loads the enriched data into PostgreSQL.
+    from each article's URL, performs NLP analysis (sentiment + NER), and then
+    loads the enriched data into PostgreSQL.
 
     ## Tasks:
     1. `extract_newsapi_task`: Extracts top headlines from NewsAPI.
