@@ -34,12 +34,12 @@ Chain strategy: pending
 
 *Clean move per module: create module → update DAG import → update test mocks → remove function body from DAG → `pytest` after each step.*
 
-- [ ] 2.1 Create `dags/pipeline/extract.py` → `extract_data_from_newsapi` + per-module logger. Update DAG import. Update `tests/unit/test_extract.py` (5 patch paths + 5 `from news_etl_dag` imports → `pipeline.extract`). Remove function body from DAG. `pytest tests/unit/test_extract.py` passes.
-- [ ] 2.2 Create `dags/pipeline/scrape.py` → `_is_retryable`, `_scrape_single_article`, `scrape_and_enrich_content` + per-module logger. Update DAG import. Update `tests/unit/test_scrape.py` (4 `from news_etl_dag` imports → `pipeline.scrape`, 2 `@patch("news_etl_dag.xxx")` → `pipeline.scrape`, 1 `patch("news_etl_dag._scrape_single_article")` → `pipeline.scrape`). Remove function body from DAG. `pytest tests/unit/test_scrape.py` passes.
-- [ ] 2.3 Create `dags/pipeline/analyze.py` → `analyze_articles` + per-module logger. Update DAG import. Update `tests/unit/test_analyze.py` (4 `from news_etl_dag` imports → `pipeline.analyze`). Remove function body from DAG. `pytest tests/unit/test_analyze.py` passes.
-- [ ] 2.4 Create `dags/pipeline/load.py` → `load_data_to_postgres`, SQL INSERT constant + per-module logger. Update DAG import. Update `tests/unit/test_load.py` (2 `from news_etl_dag` imports + 1 `patch("news_etl_dag.get_db_connection")` → `pipeline.load`). Remove function body from DAG. `pytest tests/unit/test_load.py` passes.
-- [ ] 2.5 Update `tests/integration/test_db_load.py` (3 `from news_etl_dag` imports + 4 `patch("news_etl_dag.get_db_connection")` → `pipeline.load`). `pytest tests/integration/` passes.
-- [ ] 2.6 Final: `pytest tests/unit/ tests/integration/` — all pass after full Phase 2
+- [x] 2.1 Create `dags/pipeline/extract.py` → `extract_data_from_newsapi` + per-module logger. Update DAG import. Update `tests/unit/test_extract.py` (5 patch paths + 5 `from news_etl_dag` imports → `pipeline.extract`). Remove function body from DAG. `pytest tests/unit/test_extract.py` passes.
+- [x] 2.2 Create `dags/pipeline/scrape.py` → `_is_retryable`, `_scrape_single_article`, `scrape_and_enrich_content` + per-module logger. Update DAG import. Update `tests/unit/test_scrape.py` (4 `from news_etl_dag` imports → `pipeline.scrape`, 2 `@patch("news_etl_dag.xxx")` → `pipeline.scrape`, 1 `patch("news_etl_dag._scrape_single_article")` → `pipeline.scrape`). Remove function body from DAG. `pytest tests/unit/test_scrape.py` passes.
+- [x] 2.3 Create `dags/pipeline/analyze.py` → `analyze_articles` + per-module logger. Update DAG import. Update `tests/unit/test_analyze.py` (4 `from news_etl_dag` imports → `pipeline.analyze`). Remove function body from DAG. `pytest tests/unit/test_analyze.py` passes.
+- [x] 2.4 Create `dags/pipeline/load.py` → `load_data_to_postgres`, SQL INSERT constant + per-module logger. Update DAG import. Update `tests/unit/test_load.py` (2 `from news_etl_dag` imports + 1 `patch("news_etl_dag.get_db_connection")` → `pipeline.load`). Remove function body from DAG. `pytest tests/unit/test_load.py` passes.
+- [x] 2.5 Update `tests/integration/test_db_load.py` (3 `from news_etl_dag` imports + 4 `patch("news_etl_dag.get_db_connection")` → `pipeline.load`). `pytest tests/integration/` passes.
+- [x] 2.6 Final: `pytest tests/unit/ tests/integration/` — all pass after full Phase 2
 
 ## Phase 3: Strip DAG (Wiring)
 

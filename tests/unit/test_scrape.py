@@ -29,7 +29,7 @@ class TestScrapeSingleArticle:
         )
         requests_mock.get("https://example.com/article1", text=html, status_code=200)
 
-        from news_etl_dag import _scrape_single_article
+        from pipeline.scrape import _scrape_single_article
 
         original = sample_article.copy()
         result = _scrape_single_article(original, "NewsETL/1.0", {})
@@ -44,7 +44,7 @@ class TestScrapeSingleArticle:
         THEN the original content is preserved (no crash, no retry)."""
         requests_mock.get("https://example.com/article1", status_code=404)
 
-        from news_etl_dag import _scrape_single_article
+        from pipeline.scrape import _scrape_single_article
 
         original = sample_article.copy()
         result = _scrape_single_article(original, "NewsETL/1.0", {})
@@ -59,7 +59,7 @@ class TestScrapeSingleArticle:
         rp.parse("User-agent: NewsETL\nDisallow: /\n".splitlines())
         robots_cache = {"example.com": rp}
 
-        from news_etl_dag import _scrape_single_article
+        from pipeline.scrape import _scrape_single_article
 
         original = sample_article.copy()
         result = _scrape_single_article(original, "NewsETL/1.0", robots_cache)
@@ -81,7 +81,7 @@ class TestScrapeSingleArticle:
         rp.parse("User-agent: *\nAllow: /\n".splitlines())
         robots_cache = {"example.com": rp}
 
-        from news_etl_dag import _scrape_single_article
+        from pipeline.scrape import _scrape_single_article
 
         article1 = {"title": "A1", "url": "https://example.com/article1", "content": "orig"}
         article3 = {"title": "A3", "url": "https://example.com/article3", "content": "orig"}
@@ -112,13 +112,13 @@ class TestScrapeAndEnrichContent:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = []
 
-        from news_etl_dag import scrape_and_enrich_content
+        from pipeline.scrape import scrape_and_enrich_content
 
         result = scrape_and_enrich_content(**mock_context)
         assert result == []
 
-    @patch("news_etl_dag.resolve_user_agent")
-    @patch("news_etl_dag.resolve_max_scrape_workers")
+    @patch("pipeline.scrape.resolve_user_agent")
+    @patch("pipeline.scrape.resolve_max_scrape_workers")
     def test_resolves_config_inside_callable(self, mock_workers, mock_ua, sample_articles):
         """GIVEN articles are available
         WHEN scrape_and_enrich_content runs
@@ -129,7 +129,7 @@ class TestScrapeAndEnrichContent:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = sample_articles
 
-        from news_etl_dag import scrape_and_enrich_content
+        from pipeline.scrape import scrape_and_enrich_content
 
         # The function should call the config resolvers *inside* the callable
         result = scrape_and_enrich_content(**mock_context)
@@ -138,7 +138,7 @@ class TestScrapeAndEnrichContent:
         mock_ua.assert_called_once()
         assert isinstance(result, list)
 
-    @patch("news_etl_dag.resolve_max_scrape_workers", return_value=2)
+    @patch("pipeline.scrape.resolve_max_scrape_workers", return_value=2)
     def test_robots_cache_initialized_inside_function(
         self, mock_workers, requests_mock, sample_articles
     ):
@@ -160,10 +160,10 @@ class TestScrapeAndEnrichContent:
             status_code=200,
         )
 
-        from news_etl_dag import scrape_and_enrich_content
+        from pipeline.scrape import scrape_and_enrich_content
 
         with patch(
-            "news_etl_dag._scrape_single_article",
+            "pipeline.scrape._scrape_single_article",
             side_effect=lambda a, ua, cache: a,
         ):
             result = scrape_and_enrich_content(**mock_context)
@@ -180,7 +180,7 @@ class TestScrapeAndEnrichContent:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = None
 
-        from news_etl_dag import scrape_and_enrich_content
+        from pipeline.scrape import scrape_and_enrich_content
 
         result = scrape_and_enrich_content(**mock_context)
         assert result == []
