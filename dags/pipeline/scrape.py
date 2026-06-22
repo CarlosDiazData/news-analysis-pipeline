@@ -96,7 +96,7 @@ def _scrape_single_article(article: dict, user_agent: str, robots_cache: dict) -
     return article
 
 
-def scrape_and_enrich_content(**context):
+def scrape_and_enrich_content(**context) -> list[dict]:
     """Performs concurrent web scraping on article URLs with robots.txt compliance.
 
     Uses ThreadPoolExecutor with configurable workers, tenacity retry with
