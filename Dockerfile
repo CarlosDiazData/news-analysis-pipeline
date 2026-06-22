@@ -12,8 +12,8 @@ RUN apt-get update && \
 
 # Switch to airflow user to install packages
 USER airflow
-COPY requirements.txt /opt/airflow/requirements.txt
-RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
+COPY requirements.lock /opt/airflow/requirements.lock
+RUN pip install --no-cache-dir -r /opt/airflow/requirements.lock
 
 # Download the spaCy language model
 RUN python -m spacy download en_core_web_sm
