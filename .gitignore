@@ -21,7 +21,6 @@ logs/
 # Docker
 *.log
 .env
-.dockerignore
 
 # VSCode / IDEs
 .vscode/
