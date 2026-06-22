@@ -4,49 +4,16 @@ This DAG extracts news articles from NewsAPI, enriches them via web scraping,
 and loads them into a PostgreSQL database.
 """
 
-# Airflow and provider modules
-# Standard library modules
-import json
-import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from urllib.parse import urlparse
-from urllib.robotparser import RobotFileParser
 
-# HTTP and retry
-import requests
-import spacy
 from airflow import DAG
-from airflow.exceptions import AirflowException
 from airflow.operators.python import PythonOperator
 
-# Web Scraping and ML modules
-from bs4 import BeautifulSoup
-
-# Pipeline modules
-from pipeline.config import DAG_ID, NEWS_API_ENDPOINT
+from pipeline.config import DAG_ID
 from pipeline.extract import extract_data_from_newsapi
 from pipeline.scrape import scrape_and_enrich_content
 from pipeline.analyze import analyze_articles
 from pipeline.load import load_data_to_postgres
-
-# Credential resolution (task-scoped, never at module top-level)
-from pipeline.credentials import (
-    get_db_connection,
-    resolve_max_scrape_workers,
-    resolve_newsapi_key,
-    resolve_user_agent,
-)
-from tenacity import (
-    retry,
-    retry_if_exception,
-    stop_after_attempt,
-    wait_exponential,
-)
-from textblob import TextBlob
-
-# Get a logger for this module
-logger = logging.getLogger(__name__)
 
 
 # ===========================================================================
