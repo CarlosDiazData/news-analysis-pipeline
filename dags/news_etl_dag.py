@@ -14,6 +14,7 @@ from pipeline.extract import extract_data_from_newsapi
 from pipeline.scrape import scrape_and_enrich_content
 from pipeline.analyze import analyze_articles
 from pipeline.load import load_data_to_postgres
+from pipeline.sla_callbacks import on_sla_miss
 
 
 # ===========================================================================
@@ -35,17 +36,20 @@ with DAG(
     catchup=False,
     tags=["newsapi", "postgres", "scraping", "news"],
     default_args=default_args,
+    sla_miss_callback=on_sla_miss,
     doc_md="""
     # NewsAPI to PostgreSQL ETL with Web Scraping
 
     This DAG extracts news articles from NewsAPI, scrapes the full content
-    from each article's URL, and then loads the enriched data into PostgreSQL.
+    from each article's URL, performs NLP analysis (sentiment + NER), and then
+    loads the enriched data into PostgreSQL.
 
     ## Tasks:
     1. `extract_newsapi_task`: Extracts top headlines from NewsAPI.
     2. `scrape_content_task`: Scrapes the full content for each article.
-    3. `ml_analysis_task`: Performs sentiment analysis and NER.
-    4. `load_postgres_task`: Loads the enriched articles into PostgreSQL.
+     3. `ml_analysis_task`: Analyzes articles with sentiment analysis and NER.
+     4. `load_postgres_task`: Loads the enriched articles into PostgreSQL
+        (SLA: 9 hours — data must be ready before 9 AM).
     """,
 ) as dag:
     # Task 1: Extract data from NewsAPI
@@ -66,10 +70,12 @@ with DAG(
         python_callable=analyze_articles,
     )
 
-    # Task 4: Load enriched data into PostgreSQL
+    # Task 4: Load enriched data into PostgreSQL (9h SLA — data must be
+    #   ready before 9 AM consumption window when DAG runs at midnight).
     load_task = PythonOperator(
         task_id="load_postgres_task",
         python_callable=load_data_to_postgres,
+        sla=timedelta(hours=9),
     )
 
     # Task dependency chain

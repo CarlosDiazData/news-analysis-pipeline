@@ -76,3 +76,46 @@ class TestDagIntegrity:
             "load_postgres_task",
         }
         assert task_ids == expected, f"Task IDs mismatch: {task_ids}"
+
+    def test_load_task_has_sla(self):
+        """GIVEN the news ETL DAG
+        WHEN parsed
+        THEN load_postgres_task has sla=timedelta(hours=9)."""
+        try:
+            from airflow.models import DagBag
+        except ImportError:
+            pytest.skip("Airflow not installed")
+
+        from datetime import timedelta
+
+        dag_folder = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
+        dagbag = DagBag(dag_folder=dag_folder, include_examples=False)
+
+        dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
+        assert dag is not None, "Expected DAG not found"
+
+        load_task = dag.get_task("load_postgres_task")
+        assert load_task.sla == timedelta(hours=9), (
+            f"Expected sla=9h, got {load_task.sla}"
+        )
+
+    def test_dag_has_sla_miss_callback(self):
+        """GIVEN the news ETL DAG
+        WHEN parsed
+        THEN sla_miss_callback is wired to on_sla_miss."""
+        try:
+            from airflow.models import DagBag
+        except ImportError:
+            pytest.skip("Airflow not installed")
+
+        dag_folder = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
+        dagbag = DagBag(dag_folder=dag_folder, include_examples=False)
+
+        dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
+        assert dag is not None, "Expected DAG not found"
+
+        from pipeline.sla_callbacks import on_sla_miss
+
+        assert dag.sla_miss_callback is on_sla_miss, (
+            f"sla_miss_callback not wired correctly: {dag.sla_miss_callback}"
+        )
