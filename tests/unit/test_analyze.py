@@ -60,7 +60,7 @@ class TestAnalyzeArticles:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = [enriched_article]
 
-        from news_etl_dag import analyze_articles
+        from pipeline.analyze import analyze_articles
 
         result = analyze_articles(**mock_context)
 
@@ -86,7 +86,7 @@ class TestAnalyzeArticles:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = articles_with_varied_content
 
-        from news_etl_dag import analyze_articles
+        from pipeline.analyze import analyze_articles
 
         result = analyze_articles(**mock_context)
 
@@ -104,7 +104,7 @@ class TestAnalyzeArticles:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = []
 
-        from news_etl_dag import analyze_articles
+        from pipeline.analyze import analyze_articles
 
         result = analyze_articles(**mock_context)
         assert result == []
@@ -116,7 +116,7 @@ class TestAnalyzeArticles:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = [enriched_article]
 
-        from news_etl_dag import analyze_articles
+        from pipeline.analyze import analyze_articles
 
         result = analyze_articles(**mock_context)
         article = result[0]

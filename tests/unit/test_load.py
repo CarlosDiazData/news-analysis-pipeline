@@ -61,7 +61,7 @@ class TestLoadDataToPostgres:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = []
 
-        from news_etl_dag import load_data_to_postgres
+        from pipeline.load import load_data_to_postgres
 
         result = load_data_to_postgres(**mock_context)
         assert result == 0
@@ -77,9 +77,9 @@ class TestLoadDataToPostgres:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = load_ready_articles
 
-        from news_etl_dag import load_data_to_postgres
+        from pipeline.load import load_data_to_postgres
 
-        with patch("news_etl_dag.get_db_connection", return_value=mock_conn):
+        with patch("pipeline.load.get_db_connection", return_value=mock_conn):
             load_data_to_postgres(**mock_context)
 
         # Verify the SQL was executed
@@ -104,10 +104,10 @@ class TestLoadDataToPostgres:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = load_ready_articles
 
-        from news_etl_dag import load_data_to_postgres
+        from pipeline.load import load_data_to_postgres
 
         with (
-            patch("news_etl_dag.get_db_connection", return_value=mock_conn),
+            patch("pipeline.load.get_db_connection", return_value=mock_conn),
             pytest.raises(AirflowException, match="Database error"),
         ):
             load_data_to_postgres(**mock_context)
@@ -127,9 +127,9 @@ class TestLoadDataToPostgres:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = load_ready_articles
 
-        from news_etl_dag import load_data_to_postgres
+        from pipeline.load import load_data_to_postgres
 
-        with patch("news_etl_dag.get_db_connection", return_value=mock_conn):
+        with patch("pipeline.load.get_db_connection", return_value=mock_conn):
             load_data_to_postgres(**mock_context)
 
         call_args = mock_cursor.executemany.call_args
@@ -148,9 +148,9 @@ class TestLoadDataToPostgres:
         mock_context = {"ti": MagicMock()}
         mock_context["ti"].xcom_pull.return_value = load_ready_articles
 
-        from news_etl_dag import load_data_to_postgres
+        from pipeline.load import load_data_to_postgres
 
-        with patch("news_etl_dag.get_db_connection", return_value=mock_conn):
+        with patch("pipeline.load.get_db_connection", return_value=mock_conn):
             load_data_to_postgres(**mock_context)
 
         call_args = mock_cursor.executemany.call_args
