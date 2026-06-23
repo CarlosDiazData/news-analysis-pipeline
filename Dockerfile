@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM apache/airflow:2.11.2-python3.11
+FROM apache/airflow:3.2.2-python3.12
 
 USER root
 RUN apt-get update && \

@@ -6,8 +6,9 @@ and loads them into a PostgreSQL database.
 
 from datetime import datetime, timedelta
 
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.sdk import DAG
+from airflow.providers.standard.operators.python import PythonOperator
+from airflow.sdk.definitions.deadline import DeadlineAlert, DagRunLogicalDateDeadline, SyncCallback
 
 from pipeline.config import DAG_ID
 from pipeline.extract import extract_data_from_newsapi
@@ -36,7 +37,11 @@ with DAG(
     catchup=False,
     tags=["newsapi", "postgres", "scraping", "news"],
     default_args=default_args,
-    sla_miss_callback=on_sla_miss,
+    deadline=DeadlineAlert(
+        reference=DagRunLogicalDateDeadline(),
+        interval=timedelta(hours=9),
+        callback=SyncCallback(on_sla_miss),
+    ),
     doc_md="""
     # NewsAPI to PostgreSQL ETL with Web Scraping
 
@@ -70,12 +75,11 @@ with DAG(
         python_callable=analyze_articles,
     )
 
-    # Task 4: Load enriched data into PostgreSQL (9h SLA — data must be
+    # Task 4: Load enriched data into PostgreSQL (Deadline: 9h after logical_date — data must be
     #   ready before 9 AM consumption window when DAG runs at midnight).
     load_task = PythonOperator(
         task_id="load_postgres_task",
         python_callable=load_data_to_postgres,
-        sla=timedelta(hours=9),
     )
 
     # Task dependency chain

@@ -51,20 +51,23 @@ services:
       - NEWS_API_TOPIC=${NEWS_API_TOPIC:-}
       - USER_AGENT=${USER_AGENT:-NewsETL/1.0 (news-analysis-pipeline)}
       - MAX_SCRAPE_WORKERS=${MAX_SCRAPE_WORKERS:-4}
+      - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE=/opt/airflow/airflow_passwords.json
     volumes:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
+      - ./tests:/opt/airflow/tests
+      - ./pyproject.toml:/opt/airflow/pyproject.toml:ro
+      - ./config/airflow_passwords.json:/opt/airflow/airflow_passwords.json
     ports:
       - "8080:8080"
     command: >
       bash -c "
-      airflow db init &&
-      airflow users create --username admin --password ${AIRFLOW_PASSWORD:-admin} --firstname Admin --lastname User --role Admin --email ${AIRFLOW_EMAIL:-admin@example.com} &&
-      (airflow scheduler & airflow webserver)
+      airflow db migrate &&
+      (airflow scheduler & airflow api-server)
       "
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /opt/airflow/airflow-webserver.pid ]"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v2/monitor/health')\""]
       interval: 30s
       timeout: 30s
       retries: 5

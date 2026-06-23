@@ -49,8 +49,6 @@ class TestDagIntegrity:
 
         for dag_id in dag_ids:
             dag = dagbag.dags.get(dag_id)
-            # Airflow raises during DAG creation for cyclical dependencies,
-            # so if the DAG exists, it's cycle-free.
             assert dag is not None, f"DAG '{dag_id}' is None"
 
     def test_dag_has_expected_task_ids(self):
@@ -77,34 +75,40 @@ class TestDagIntegrity:
         }
         assert task_ids == expected, f"Task IDs mismatch: {task_ids}"
 
-    def test_load_task_has_sla(self):
+    def test_dag_has_deadline_alert(self):
         """GIVEN the news ETL DAG
         WHEN parsed
-        THEN load_postgres_task has sla=timedelta(hours=9)."""
+        THEN the DAG has a DeadlineAlert configured with 9h interval."""
         try:
             from airflow.models import DagBag
+            from airflow.sdk.definitions.deadline import DeadlineAlert
         except ImportError:
             pytest.skip("Airflow not installed")
+
+        dag_folder = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
+        dagbag = DagBag(dag_folder=dag_folder, include_examples=False)
+
+        dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
+        assert dag is not None, "Expected DAG not found"
 
         from datetime import timedelta
 
-        dag_folder = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
-        dagbag = DagBag(dag_folder=dag_folder, include_examples=False)
+        assert dag.deadline is not None, "DAG has no deadline configured"
+        assert len(dag.deadline) == 1, f"Expected 1 deadline, got {len(dag.deadline)}"
 
-        dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
-        assert dag is not None, "Expected DAG not found"
-
-        load_task = dag.get_task("load_postgres_task")
-        assert load_task.sla == timedelta(hours=9), (
-            f"Expected sla=9h, got {load_task.sla}"
+        deadline = dag.deadline[0]
+        assert isinstance(deadline, DeadlineAlert), f"Expected DeadlineAlert, got {type(deadline)}"
+        assert deadline.interval == timedelta(hours=9), (
+            f"Expected 9h interval, got {deadline.interval}"
         )
 
-    def test_dag_has_sla_miss_callback(self):
+    def test_dag_deadline_has_callback(self):
         """GIVEN the news ETL DAG
         WHEN parsed
-        THEN sla_miss_callback is wired to on_sla_miss."""
+        THEN the DeadlineAlert callback is a SyncCallback wrapping on_sla_miss."""
         try:
             from airflow.models import DagBag
+            from airflow.sdk.definitions.deadline import SyncCallback
         except ImportError:
             pytest.skip("Airflow not installed")
 
@@ -114,8 +118,15 @@ class TestDagIntegrity:
         dag = dagbag.dags.get("ingestion_newsapi_postgres_with_scraping")
         assert dag is not None, "Expected DAG not found"
 
+        deadline = dag.deadline[0]
+        assert isinstance(deadline.callback, SyncCallback), (
+            f"Expected SyncCallback, got {type(deadline.callback)}"
+        )
+
         from pipeline.sla_callbacks import on_sla_miss
 
-        assert dag.sla_miss_callback is on_sla_miss, (
-            f"sla_miss_callback not wired correctly: {dag.sla_miss_callback}"
+        # SyncCallback stores the callable path, not the callable itself
+        # Verify the callback is wired (path contains 'on_sla_miss')
+        assert "on_sla_miss" in str(deadline.callback.path), (
+            f"Callback not wired to on_sla_miss: {deadline.callback.path}"
         )

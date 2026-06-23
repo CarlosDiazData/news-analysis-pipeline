@@ -24,8 +24,13 @@ class TestLockFile:
         WHEN pip-compile --check runs
         THEN it exits 0 (in sync).
 
-        Skipped if pip-compile does not support --check (pip-tools < 7.1).
+        Skipped if pip-compile is not installed or doesn't support --check.
         """
+        import shutil
+
+        if not shutil.which("pip-compile"):
+            pytest.skip("pip-compile not installed in this environment")
+
         # Probe whether --check is supported
         probe = subprocess.run(
             ["pip-compile", "--check", "--help"],
