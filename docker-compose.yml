@@ -51,12 +51,14 @@ services:
       - NEWS_API_TOPIC=${NEWS_API_TOPIC:-}
       - USER_AGENT=${USER_AGENT:-NewsETL/1.0 (news-analysis-pipeline)}
       - MAX_SCRAPE_WORKERS=${MAX_SCRAPE_WORKERS:-4}
+      - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE=/opt/airflow/airflow_passwords.json
     volumes:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
       - ./tests:/opt/airflow/tests
       - ./pyproject.toml:/opt/airflow/pyproject.toml:ro
+      - ./config/airflow_passwords.json:/opt/airflow/airflow_passwords.json
     ports:
       - "8080:8080"
     command: >
