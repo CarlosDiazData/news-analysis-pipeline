@@ -55,6 +55,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
+      - ./tests:/opt/airflow/tests
+      - ./pyproject.toml:/opt/airflow/pyproject.toml:ro
     ports:
       - "8080:8080"
     command: >

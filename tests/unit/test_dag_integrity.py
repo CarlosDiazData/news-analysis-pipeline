@@ -125,6 +125,8 @@ class TestDagIntegrity:
 
         from pipeline.sla_callbacks import on_sla_miss
 
-        assert deadline.callback.callback_callable is on_sla_miss, (
-            f"Callback not wired to on_sla_miss: {deadline.callback.callback_callable}"
+        # SyncCallback stores the callable path, not the callable itself
+        # Verify the callback is wired (path contains 'on_sla_miss')
+        assert "on_sla_miss" in str(deadline.callback.path), (
+            f"Callback not wired to on_sla_miss: {deadline.callback.path}"
         )
