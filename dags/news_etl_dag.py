@@ -6,8 +6,8 @@ and loads them into a PostgreSQL database.
 
 from datetime import datetime, timedelta
 
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.sdk import DAG
+from airflow.providers.standard.operators.python import PythonOperator
 
 from pipeline.config import DAG_ID
 from pipeline.extract import extract_data_from_newsapi

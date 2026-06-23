@@ -34,7 +34,7 @@ def _try_airflow_connection(conn_id: str) -> Optional[dict[str, str]]:
     Returns None if Airflow is unavailable or the connection doesn't exist.
     """
     try:
-        from airflow.hooks.base import BaseHook
+        from airflow.sdk import BaseHook
 
         conn = BaseHook.get_connection(conn_id)
         if conn:
@@ -56,7 +56,7 @@ def _try_airflow_variable(key: str) -> Optional[str]:
     Returns None if Airflow is unavailable or the variable is not set.
     """
     try:
-        from airflow.models import Variable
+        from airflow.sdk import Variable
 
         val = Variable.get(key)
         if val:
