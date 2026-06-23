@@ -10,7 +10,7 @@ from textblob import TextBlob
 logger = logging.getLogger(__name__)
 
 
-def analyze_articles(**context):
+def analyze_articles(**context) -> list[dict]:
     """Analyzes articles for sentiment and named entities using ML models.
 
     Args:

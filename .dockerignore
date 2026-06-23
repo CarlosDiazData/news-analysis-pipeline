@@ -1,0 +1,36 @@
+# Secrets and credentials
+.env
+
+# Version control
+.git/
+
+# Runtime artifacts
+logs/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Test and development
+airflow_home_test/
+.github/
+Docs/
+openspec/
+tests/
+requirements.in
+pyproject.toml
+readme.md
+LICENSE.txt
+.gitignore
+.env.example
+
+# Mounted volumes (handled at runtime)
+data/
+
+# Database initialization (handled by postgres container)
+init_db/
+
+# IDE configuration
+.atl/
+
+# pgAdmin config (not needed at build)
+config/

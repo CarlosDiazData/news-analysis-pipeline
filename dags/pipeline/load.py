@@ -26,7 +26,7 @@ SQL_INSERT = """
     """
 
 
-def load_data_to_postgres(**context):
+def load_data_to_postgres(**context) -> int:
     """Loads data into PostgreSQL with transaction management and duplicate handling.
 
     Uses stratified credential resolution inside the task callable:
@@ -34,6 +34,9 @@ def load_data_to_postgres(**context):
 
     Args:
         context (dict): Airflow context for accessing XCom data.
+
+    Returns:
+        int: Number of records inserted/updated.
 
     Raises:
         AirflowException: If no data to load or database error occurs.
@@ -71,7 +74,8 @@ def load_data_to_postgres(**context):
     try:
         cursor.executemany(SQL_INSERT, records)
         conn.commit()
-        logger.info("Successfully inserted or updated %s records.", cursor.rowcount)
+        logger.info("Successfully inserted or updated %s records.", len(records))
+        return len(records)
     except Exception as exc:
         conn.rollback()
         logger.error("Database operation failed: %s", exc)

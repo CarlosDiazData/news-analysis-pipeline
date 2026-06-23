@@ -132,6 +132,64 @@ def resolve_newsapi_key() -> str:
     )
 
 
+def resolve_newsapi_country() -> str:
+    """Resolve the NewsAPI country parameter with stratified fallback.
+
+    Resolution order:
+        1. Airflow Variable (NEWS_API_COUNTRY)
+        2. Environment variable (NEWS_API_COUNTRY)
+        3. .env file
+        4. Default: config.NEWS_API_COUNTRY ("us")
+
+    Returns:
+        str: The resolved country code (e.g., "us", "ar", "fr").
+    """
+    # 1. Airflow Variable
+    var_val = _try_airflow_variable("NEWS_API_COUNTRY")
+    if var_val:
+        return var_val
+
+    # 2. Environment variables + .env fallback
+    _load_dotenv()
+
+    env_val = os.environ.get("NEWS_API_COUNTRY")
+    if env_val:
+        return env_val
+
+    from pipeline.config import NEWS_API_COUNTRY
+
+    return NEWS_API_COUNTRY
+
+
+def resolve_newsapi_topic() -> Optional[str]:
+    """Resolve the NewsAPI topic (category) parameter with stratified fallback.
+
+    Resolution order:
+        1. Airflow Variable (NEWS_API_TOPIC)
+        2. Environment variable (NEWS_API_TOPIC)
+        3. .env file
+        4. Default: config.NEWS_API_TOPIC (None — no category filter)
+
+    Returns:
+        str | None: The resolved topic (e.g., "sports", "technology") or None.
+    """
+    # 1. Airflow Variable
+    var_val = _try_airflow_variable("NEWS_API_TOPIC")
+    if var_val:
+        return var_val
+
+    # 2. Environment variables + .env fallback
+    _load_dotenv()
+
+    env_val = os.environ.get("NEWS_API_TOPIC")
+    if env_val:
+        return env_val
+
+    from pipeline.config import NEWS_API_TOPIC
+
+    return NEWS_API_TOPIC
+
+
 def resolve_user_agent() -> str:
     """Resolve the User-Agent string for HTTP scraping requests.
 

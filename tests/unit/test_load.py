@@ -69,9 +69,10 @@ class TestLoadDataToPostgres:
     def test_insert_success(self, load_ready_articles):
         """GIVEN valid analyzed articles
         WHEN load_data_to_postgres runs
-        THEN executemany is called, commit is called, and no exception."""
+        THEN executemany is called, commit is called, and returns record count."""
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
+        mock_cursor.rowcount = len(load_ready_articles)
         mock_conn.cursor.return_value = mock_cursor
 
         mock_context = {"ti": MagicMock()}
@@ -80,7 +81,10 @@ class TestLoadDataToPostgres:
         from pipeline.load import load_data_to_postgres
 
         with patch("pipeline.load.get_db_connection", return_value=mock_conn):
-            load_data_to_postgres(**mock_context)
+            result = load_data_to_postgres(**mock_context)
+
+        # Verify return value equals number of records loaded
+        assert result == len(load_ready_articles)
 
         # Verify the SQL was executed
         mock_cursor.executemany.assert_called_once()
